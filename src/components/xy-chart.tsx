@@ -2,11 +2,10 @@
 import React, { FC, useEffect, useId, useLayoutEffect, useState } from "react";
 import * as am5 from "@amcharts/amcharts5";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
-import am5themes_Spirited from "@amcharts/amcharts5/themes/Spirited";
 
 import * as am5xy from "@amcharts/amcharts5/xy";
 import { XYdata } from "../pages/chartHome";
-import themes from "./custom-theme"
+import ThemeSelect,{ allThemes } from "./custom-theme";
 
 export type XYProps = {
     data: XYdata[];
@@ -19,6 +18,8 @@ const XyChart: FC<XYProps> = ({ data }) => {
     const chartId = useId();
     let [chartState, setChart] = useState<number>(0);
     let [chartData, setData] = useState<XYdata[]>([]);
+    let [amRoot, setRoot] = useState<am5.Root>();
+    let [chartTheme, setTheme] = useState<am5.Theme>();
 
     //let chartRef = React.createRef<HTMLDivElement>(); 
     // let chartRef = useRef(null); 
@@ -26,25 +27,29 @@ const XyChart: FC<XYProps> = ({ data }) => {
     // const series2Ref = useRef(null);
     //const xAxisRef = useRef(null);
 
-
     useLayoutEffect(() => {
         setData(data);
         console.log('***rendering***', chartState);
 
         //let root = am5.Root.new(chartRef.current as HTMLElement);       
         let root: am5.Root = am5.Root.new(chartId);
+        setRoot(root);
 
         const customTheme = am5.Theme.new(root);
 
-        customTheme.rule("Label").setAll(themes.allianz);
+        customTheme.rule("Label").setAll(allThemes.allianz);
 
-        // Set themes
+        // Set themes from select list
         // https://www.amcharts.com/docs/v5/concepts/themes/
-        root.setThemes([am5themes_Animated.new(root), am5themes_Spirited.new(root), customTheme]);
+        let actualThemes: am5.Theme[] = [am5themes_Animated.new(root), customTheme];
+        if(chartTheme) {
+            actualThemes = [...actualThemes, chartTheme];
+        }
+        root.setThemes(actualThemes);
 
         let chart = root.container.children.push(
             am5xy.XYChart.new(root, {
-                panX: false,
+                panX: true,
                 panY: false,
                 wheelX: "panX",
                 wheelY: "zoomX",
@@ -82,29 +87,6 @@ const XyChart: FC<XYProps> = ({ data }) => {
                 renderer: am5xy.AxisRendererY.new(root, {})
             })
         );
-
-        // Create series
-        // let series1: am5xy.ColumnSeries = chart.series.push(
-        //     am5xy.ColumnSeries.new(root, {
-        //         name: "Series",
-        //         xAxis: xAxis,
-        //         yAxis: yAxis,
-        //         valueYField: "value1",
-        //         categoryXField: "category"
-        //     })
-        // );
-        // series1.data.setAll(data);
-
-        // let series2 = chart.series.push(
-        //     am5xy.ColumnSeries.new(root, {
-        //         name: "Series",
-        //         xAxis: xAxis,
-        //         yAxis: yAxis,
-        //         valueYField: "value2",
-        //         categoryXField: "category"
-        //     })
-        // );
-        // series2.data.setAll(data);
 
         // Add cursor
         chart.set("cursor", am5xy.XYCursor.new(root, {}));
@@ -170,7 +152,7 @@ const XyChart: FC<XYProps> = ({ data }) => {
         }
 
 
-    }, [chartData, chartId, chartState, data]);
+    }, [chartData, chartTheme, chartId, chartState, data]);
 
 
     // This code will only run when props.data changes
@@ -184,12 +166,18 @@ const XyChart: FC<XYProps> = ({ data }) => {
         //         // series2Ref?.current?.data.setAll(data);
     }, [data, chartData]);
 
+    const themeChange = event => {
+        console.log('set THEME', event);
+        setTheme(event);
+      };
+
 
     return (
         <>
 
             {/* <div ref={chartRef} id={chartId} style={{ width: "100%", height: "500px" }}></div> */}
             <div id={chartId} style={{ width: "100%", height: "500px" }}></div>
+            <ThemeSelect root={amRoot} handleChange={(event) => themeChange(event)}></ThemeSelect>
         </>
     );
 };

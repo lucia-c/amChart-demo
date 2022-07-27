@@ -9,17 +9,18 @@ import Col from 'react-bootstrap/Col';
 export type ChartProps = {
   id: string;
   label: string;
+  theme?: string;
 }
 
 
 const charts: ChartProps[] = [
   {
     id: 'xy',
-    label: "XY chart"
+    label: "XY chart",
   },
   {
     id: 'bubble',
-    label: "Bubble chart"
+    label: "Bubble chart",
   }
 ];
 

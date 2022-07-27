@@ -53,18 +53,21 @@ export type ChartHomeProps = {
 
 const ChartHome: FC<ChartHomeProps> = ({ chartType }) => {
     let [XYseries, setXySeries] = useState<number>(3);
+    let [allData, setData] = useState<ChartsData>(data);
+    
+
+    // themes.amThemes[0]
 
     const renderSwitch = (param) => {
         switch (param) {
             case 'xy':
                 return (
                     <Container>
-                        <Row><Col> <Xy {...chartType} data={data[chartType.id]} />
+                        <Row><Col> <Xy {...chartType} data={allData[chartType.id] }/>
                         </Col>
                             <Col sm={2}><ChartButton label="addSeries" variant="success" onClick={() => addXYSeries()}></ChartButton></Col>
                         </Row>
                     </Container>
-
 
                 );
             case 'bubble':
@@ -75,18 +78,20 @@ const ChartHome: FC<ChartHomeProps> = ({ chartType }) => {
     }
 
     const addXYSeries = () => {
-        setXySeries(XYseries + 1);
+        setXySeries((oldValue) => {
+            const newValue = oldValue + 1;
+            setData({...allData, xy: allData.xy.map(serie => serie = { ...serie, [`value${newValue}`]: newValue * 100 })});
+            return newValue
+        });
 
-        data.xy = data.xy.map(serie => serie = { ...serie, [`value${XYseries}`]: XYseries * 100 });
-
-        console.log(data.xy[0]);
+        console.log(allData.xy[0]);
     }
 
     return (
-        <section>
+        <>
             <h3 className="title">{chartType.label}</h3>
             {renderSwitch(chartType.id)}
-        </section>
+        </>
     );
 };
 
