@@ -1,6 +1,6 @@
 import React, { FC, useState } from 'react';
 import { ChartProps } from '../App';
-import Xy from "../components/xy-chart";
+import Xy, { XYSeriesEnums } from "../components/xy-chart";
 import './chart.module.scss';
 import ChartButton from '../components/button';
 import Container from 'react-bootstrap/Container';
@@ -8,64 +8,87 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 
 export type ChartsData = {
-    xy: XYdata[];
+    xy: {
+        xyCols: XYdata[];
+        xyLines: XYdata[];
+    }
 }
 
 export type XYdata = {
-    category: string;
     [key: string]: number | string;
 }
 
 // Define data
 let data: ChartsData =
 {
-    xy: [
-        {
-            category: "Research",
-            value1: 1000,
-            value2: 588,
-            value3: 688
-        },
-        {
-            category: "Marketing",
-            value1: 1200,
-            value2: 1800,
-            value3: 688
-        },
-        {
-            category: "Sales",
-            value1: 850,
-            value2: 1230,
-            value3: 688
-        },
-        {
-            category: "Store",
-            value1: 850,
-            value2: 1230,
-            value3: 688
-        }
-    ]
+    xy: {
+        xyCols: [
+            {
+                category: "Research",
+                value1: 1000,
+                value2: 588,
+                value3: 688
+            },
+            {
+                category: "Marketing",
+                value1: 1200,
+                value2: 1800,
+                value3: 688
+            },
+            {
+                category: "Sales",
+                value1: 850,
+                value2: 1230,
+                value3: 688
+            },
+            {
+                category: "Store",
+                value1: 850,
+                value2: 1230,
+                value3: 688
+            }
+        ],
+        xyLines: [
+            {
+                "year": "2021",
+                "europe": 5,
+                "namerica": 2.5,
+                "asia": 1
+            }, {
+                "year": "2022",
+                "europe": 2.6,
+                "namerica": 6.7,
+                "asia": 2.2
+            }, {
+                "year": "2023",
+                "europe": 4.8,
+                "namerica": 1.9,
+                "asia": 4.4
+            }
+
+        ]
+    }
 }
 
 export type ChartHomeProps = {
     chartType: ChartProps;
 };
 
-const ChartHome: FC<ChartHomeProps> = ({ chartType }) => {
-    let [XYseries, setXySeries] = useState<number>(3);
-    let [allData, setData] = useState<ChartsData>(data);
-    
+let XYseries = 3;
 
-    // themes.amThemes[0]
+const ChartHome: FC<ChartHomeProps> = ({ chartType }) => {
+    let [allData, setData] = useState<ChartsData>(data);
+    let XYSeries: XYSeriesEnums = XYSeriesEnums.Column;
 
     const renderSwitch = (param) => {
+        console.log('render chart page')
         switch (param) {
             case 'xy':
                 return (
                     <Container>
-                        <Row><Col> <Xy {...chartType} data={allData[chartType.id] }/>
+                        <Row><Col> <Xy {...chartType} data={allData[chartType.id]['xyCols']} />
                         </Col>
-                            <Col sm={2}><ChartButton label="addSeries" variant="success" onClick={() => addXYSeries()}></ChartButton></Col>
+                            <Col sm={2}><ChartButton label="addSeries" variant="success" onClick={() => manageXYSeries()}></ChartButton><ChartButton label="removeSeries" variant="danger" disabled={XYseries < 2} onClick={() => manageXYSeries(true)}></ChartButton></Col>
                         </Row>
                     </Container>
 
@@ -77,14 +100,39 @@ const ChartHome: FC<ChartHomeProps> = ({ chartType }) => {
         }
     }
 
-    const addXYSeries = () => {
-        setXySeries((oldValue) => {
-            const newValue = oldValue + 1;
-            setData({...allData, xy: allData.xy.map(serie => serie = { ...serie, [`value${newValue}`]: newValue * 100 })});
-            return newValue
-        });
+    const manageXYSeries = (remove = false) => {
 
-        console.log(allData.xy[0]);
+        setData((current) => {
+            let newData: ChartsData = current;
+            if (remove) {
+                if (XYseries > 1) {
+                    newData = {
+                        ...current, xy: {
+                            ...current.xy, xyCols: current.xy.xyCols.map(series => {
+                                delete series[`value${XYseries}`];
+                                return series
+                            })
+                        }
+                    }
+                    XYseries--
+                }
+            } else {
+                XYseries++
+                console.log(XYseries)
+                newData = {
+                    ...current, xy: {
+                        ...current.xy, xyCols: allData.xy.xyCols.map(series => series = { ...series, [`value${XYseries}`]: XYseries * 100 })
+                    }
+                }
+            }
+            return newData;
+        })
+        // setXySeries((oldValue) => {
+        //     const newValue = oldValue + 1;
+        //     setData({...allData, xy: allData.xy.map(serie => serie = { ...serie, [`value${newValue}`]: newValue * 100 })});
+        //     return newValue
+        // });
+
     }
 
     return (

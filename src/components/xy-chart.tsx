@@ -5,7 +5,21 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
 import * as am5xy from "@amcharts/amcharts5/xy";
 import { XYdata } from "../pages/chartHome";
-import ThemeSelect,{ allThemes } from "./custom-theme";
+import ThemeSelect, { allThemes } from "./custom-theme";
+import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import { Form } from "react-bootstrap";
+
+
+export enum XYSeriesEnums {
+    Column = 'Column',
+    Line = 'Line'
+}
+
+const XYSeries: XYSeriesEnums[] = [
+    XYSeriesEnums.Column, XYSeriesEnums.Line
+]
 
 export type XYProps = {
     data: XYdata[];
@@ -19,7 +33,8 @@ const XyChart: FC<XYProps> = ({ data }) => {
     let [chartState, setChart] = useState<number>(0);
     let [chartData, setData] = useState<XYdata[]>([]);
     let [amRoot, setRoot] = useState<am5.Root>();
-    let [chartTheme, setTheme] = useState<am5.Theme>();
+    let [chartTheme, setTheme] = useState<am5.Theme | null>(null);
+    let [series, setSeries] = useState<XYSeriesEnums>(XYSeriesEnums.Column);
 
     //let chartRef = React.createRef<HTMLDivElement>(); 
     // let chartRef = useRef(null); 
@@ -42,7 +57,7 @@ const XyChart: FC<XYProps> = ({ data }) => {
         // Set themes from select list
         // https://www.amcharts.com/docs/v5/concepts/themes/
         let actualThemes: am5.Theme[] = [am5themes_Animated.new(root), customTheme];
-        if(chartTheme) {
+        if (chartTheme) {
             actualThemes = [...actualThemes, chartTheme];
         }
         root.setThemes(actualThemes);
@@ -146,38 +161,52 @@ const XyChart: FC<XYProps> = ({ data }) => {
 
         chart.appear(1000, 100);
 
+        let legend1 = chart.children.push(am5.Legend.new(root, {
+
+            nameField: "name",
+            fillField: "color",
+            strokeField: "color",
+            centerX: am5.percent(50),
+            x: am5.percent(50)
+        }));
+
+        legend1.data.setAll([{
+            name: "Under budget",
+            color: am5.color(0x297373)
+        }, {
+            name: "Over budget",
+            color: am5.color(0xff621f)
+        }]);
+
         return () => {
             root.dispose();
             setChart(1);
         }
 
 
-    }, [chartData, chartTheme, chartId, chartState, data]);
-
-
-    // This code will only run when props.data changes
-    useEffect(() => {
-        console.log('change data');
-        setData(data);
-
-
-        //     // xAxisRef?['current']['data'].setAll(data);
-        //         // series1Ref?.current?.data.setAll(data);
-        //         // series2Ref?.current?.data.setAll(data);
-    }, [data, chartData]);
-
-    const themeChange = event => {
-        console.log('set THEME', event);
-        setTheme(event);
-      };
-
+    }, [chartData, chartTheme, chartId, chartState, data, series]);
 
     return (
         <>
-
-            {/* <div ref={chartRef} id={chartId} style={{ width: "100%", height: "500px" }}></div> */}
-            <div id={chartId} style={{ width: "100%", height: "500px" }}></div>
-            <ThemeSelect root={amRoot} handleChange={(event) => themeChange(event)}></ThemeSelect>
+            <Container>
+                <Row>
+                    <Col>
+                        <Form.Select aria-label="XY series type" onChange={(event) => setSeries(XYSeriesEnums[event.target.value])}>
+                            <option>Select chart theme</option>
+                            {
+                                XYSeries.map((serie) => {
+                                    return <option value={serie} key={serie}> {serie} </option>
+                                })}
+                        </Form.Select>
+                    </Col>
+                </Row>
+                <Row>
+                    <Col>
+                        {/* <div ref={chartRef} id={chartId} style={{ width: "100%", height: "500px" }}></div> */}
+                        <div id={chartId} style={{ width: "100%", height: "500px" }}></div>
+                        <ThemeSelect root={amRoot} handleChange={(event) => setTheme(event)}></ThemeSelect>
+                    </Col> </Row>
+            </Container>
         </>
     );
 };
