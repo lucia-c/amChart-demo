@@ -5,6 +5,7 @@ import './App.scss';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import { Stack } from 'react-bootstrap';
 
 export type ChartProps = {
   id: string;
@@ -16,11 +17,11 @@ export type ChartProps = {
 const charts: ChartProps[] = [
   {
     id: 'xy',
-    label: "XY chart",
+    label: "XY charts",
   },
   {
-    id: 'bubble',
-    label: "Bubble chart",
+    id: 'hierarchy',
+    label: "Hierarchy charts",
   }
 ];
 
@@ -38,20 +39,29 @@ function App() {
 
   return (
     <div className="App">
-      <h2 className="titolo">Charts Demo</h2>
-      <section className="container text-center my-3">
-        <ChartHome chartType={chartType} />
-      </section>
       <Container>
-        <Row>
+        <Row className="justify-content-md-center">
 
-          {
-            charts.map((chart, index) => {
-              const { id } = chart; //destrutturazione
-              return <Col key={id}> <Button {...chart} disabled={chartType.id === chart.id} onClick={() => changeChart(chart.id)}></Button></Col>
-            })}
-
+          <Col>
+            <h2 className="titolo display-4">Charts Demo</h2>
+          </Col>
         </Row>
+        <Row className="justify-content-md-center mb-4">
+          <Col xs="auto">
+            <Stack direction="horizontal" gap={3}>
+              {
+                charts.map((chart, index) => {
+                  const { id } = chart; //destrutturazione
+                  return <Button key={id} {...chart} disabled={chartType.id === chart.id} onClick={() => changeChart(chart.id)} size={'lg'}></Button>
+                })}
+
+            </Stack>
+          </Col>
+        </Row>
+        <Row><Col>
+          <ChartHome chartType={chartType} />
+        </Col></Row>
+
       </Container>
     </div>
   )

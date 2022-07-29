@@ -35,7 +35,7 @@ export const allThemes: chartThemesProps = {
         { name: 'Spirited', theme: am5themes_Spirited }
     ],
     allianz: {
-        fill: am5.color(0xFF0000),
+        //fill: am5.color(0xFF0000),
         fontSize: "1em",
         //fontVariant: "small-caps"
     }
