@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-import React, { FC,  useId, useLayoutEffect, useState } from "react";
+import React, { FC, useId, useLayoutEffect, useState } from "react";
 import * as am5 from "@amcharts/amcharts5";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
@@ -35,7 +35,7 @@ const HierarchyChart: FC<HierarchyProps> = ({ data, changeXYSerie }) => {
     let [chartData, setData] = useState<XYdata[]>([]);
     let [amRoot, setRoot] = useState<am5.Root>();
     let [chartTheme, setTheme] = useState<am5.Theme | null>(null);
-    let [chartSeries, setSeries] = useState<HierarchySeriesEnums>(HierarchySeriesEnums.Force);
+    let [chartSeries, setSeries] = useState<HierarchySeriesEnums>(HierarchySeries[0]);
 
     //let chartRef = React.createRef<HTMLDivElement>(); 
     // let chartRef = useRef(null); 
@@ -74,38 +74,66 @@ const HierarchyChart: FC<HierarchyProps> = ({ data, changeXYSerie }) => {
 
         let series = container.children.push(
             am5hierarchy.ForceDirected.new(root, {
-              downDepth: 1,
-              initialDepth: 2,
-              topDepth: 2,
-              valueField: "value",
-              categoryField: "name",
-              childDataField: "children",
-              // minRadius: 20,
-              // maxRadius: am5.percent(15)
+                centerStrength: 1,
+                manyBodyStrength: 0.5,
+                //downDepth: 1,
+                //initialDepth: 3,
+                topDepth: 2,
+                valueField: "value",
+                categoryField: "name",
+                childDataField: "children",
+                nodePadding: 0.1,
+                //linkWithStrength: 20,
+                minRadius: 20,
+                maxRadius: am5.percent(15),
+                // initialFrames: 100,
+                // showOnFrame: 30,
+                // velocityDecay:0.4
             })
-          );
+        );
+
+        series.circles.template.setAll({
+            fillOpacity: 0.7,
+            strokeWidth: 1,
+            strokeOpacity: 1
+        });
 
 
-          
-          series.outerCircles.template.states.create("disabled", {
+        series.outerCircles.template.states.create("disabled", {
             fillOpacity: 0.5,
             strokeOpacity: 0,
             strokeDasharray: 0
-          });
-          
-          series.outerCircles.template.states.create("hoverDisabled", {
-            fillOpacity: 0.5,
-            strokeOpacity: 0,
-            strokeDasharray: 0
-          });
-   
-          series.data.setAll(chartData);
-          series.set("selectedDataItem", series.dataItems[0]);
-          
+        });
 
-            // Make stuff animate on load
-            // https://www.amcharts.com/docs/v5/concepts/animations/
-            series.appear();
+        series.outerCircles.template.states.create("hover", {
+            fillOpacity: 1,
+            strokeOpacity: 0,
+            strokeDasharray: 0,
+            scale: 1.3
+        });
+
+        series.nodes.template.setAll({
+            draggable: false
+        });
+
+        series.links.template.setAll({
+            strokeWidth: 0,
+            strokeOpacity: 0
+        });
+
+        series.labels.template.setAll({
+            fontSize: 20,
+            //fill: am5.color(0x550000),
+            text: "{category}"
+          });
+
+        series.data.setAll(chartData);
+        series.set("selectedDataItem", series.dataItems[0]);
+
+
+        // Make stuff animate on load
+        // https://www.amcharts.com/docs/v5/concepts/animations/
+        series.appear();
 
 
         return () => {
