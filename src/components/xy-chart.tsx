@@ -10,6 +10,7 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { Form } from "react-bootstrap";
+import ChartCreation from "../common/hooks/chart.hook"
 
 
 export enum XYSeriesEnums {
@@ -37,23 +38,19 @@ const XyChart: FC<XYProps> = ({ data, changeXYSerie }) => {
     const [amRoot, setAmRoot] = useState<am5.Root>();
     const [chartTheme, setChartTheme] = useState<am5.Theme | null>(null);
     const [chartSeries, setChartSeries] = useState<XYSeriesEnums>(XYSeriesEnums.Column);
+    const { initChart, initLegend, primaryKey, generateLabel} = ChartCreation();
 
-    //let chartRef = React.createRef<HTMLDivElement>(); 
-    // let chartRef = useRef(null); 
-    // const series1Ref = useRef(null);
-    // const series2Ref = useRef(null);
-    //const xAxisRef = useRef(null);
-
+    
     useLayoutEffect(() => {
         setChartData(data[chartSeries]);
         console.log('***rendering***', chartState, chartSeries);
-
+        
         //let root = am5.Root.new(chartRef.current as HTMLElement);       
         let root: am5.Root = am5.Root.new(chartId);
+        
         setAmRoot(root);
 
         const customTheme = am5.Theme.new(root);
-
         customTheme.rule("Label").setAll(allThemes.allianz);
 
         // Set themes from select list
@@ -62,40 +59,13 @@ const XyChart: FC<XYProps> = ({ data, changeXYSerie }) => {
         if (chartTheme) {
             actualThemes = [...actualThemes, chartTheme];
         }
-        root.setThemes(actualThemes);
+        root.setThemes(actualThemes);    
 
-        let seriePrimaryKey = '';
-
-        switch (chartSeries) {
-            case XYSeriesEnums.Column:
-                seriePrimaryKey = 'category';
-                break;
-            case XYSeriesEnums.Line:
-                seriePrimaryKey = 'year';
-                break;
-            case XYSeriesEnums.Step:
-                seriePrimaryKey = 'date';
-                break;
-        }
-
-        let chart = root.container.children.push(
-            am5xy.XYChart.new(root, {
-                panX: true,
-                panY: false,
-                wheelX: "panX",
-                wheelY: "zoomX",
-                layout: root.verticalLayout
-            })
-        );
+        let chart = initChart(root);
 
         // Add legend
         // https://www.amcharts.com/docs/v5/charts/xy-chart/legend-xy-series/
-        let legend = chart.children.push(
-            am5.Legend.new(root, {
-                centerX: am5.p50,
-                x: am5.p50
-            })
-        );
+        let legend = chart.children.push(initLegend(root));
 
         // Create X-Axis
         let xAxis: am5xy.CategoryAxis<am5xy.AxisRenderer> | am5xy.DateAxis<am5xy.AxisRenderer>;
@@ -111,7 +81,7 @@ const XyChart: FC<XYProps> = ({ data, changeXYSerie }) => {
         
             default:
                 xAxis = chart.xAxes.push(am5xy.CategoryAxis.new(root, {
-                    categoryField: seriePrimaryKey,
+                    categoryField: primaryKey,
                     renderer: am5xy.AxisRendererX.new(root, {
                         cellStartLocation: 0.1,
                         cellEndLocation: 0.9
@@ -138,7 +108,7 @@ const XyChart: FC<XYProps> = ({ data, changeXYSerie }) => {
 
         if (chartState === 1) {
             Object.keys(chartData[0]).forEach((key) => {
-                if (key !== seriePrimaryKey) {
+                if (key !== primaryKey) {
                     if (chartSeries === XYSeriesEnums.Step) {
                         makeSeries("Series with breaks", key);
                     } else {
@@ -162,7 +132,7 @@ const XyChart: FC<XYProps> = ({ data, changeXYSerie }) => {
                 xAxis: xAxis,
                 yAxis: yAxis,
                 valueYField: field || name,
-                categoryXField: seriePrimaryKey
+                categoryXField: primaryKey
             }
 
             let series;
@@ -188,7 +158,7 @@ const XyChart: FC<XYProps> = ({ data, changeXYSerie }) => {
                     break;
                 case XYSeriesEnums.Step:
                     series = chart.series.push(am5xy.StepLineSeries.new(root, { ...seriesOptions, 
-                        valueXField: seriePrimaryKey,
+                        valueXField: primaryKey,
                         noRisers: true }));
                     series.strokes.template.setAll({
                         fillOpacity: 0.5,
@@ -207,13 +177,14 @@ const XyChart: FC<XYProps> = ({ data, changeXYSerie }) => {
             series.bullets.push(function () {
                 return am5.Bullet.new(root, {
                     locationY: 0,
-                    sprite: am5.Label.new(root, {
-                        text: "{valueY}",
-                        fill: root.interfaceColors.get("alternativeText"),
-                        centerY: 0,
-                        centerX: am5.p50,
-                        populateText: true
-                    })
+                    sprite: am5.Label.new(root,
+                        generateLabel({
+                            text: "{valueY}",
+                            fill: root.interfaceColors.get("alternativeText"),
+                            centerY: 0,
+                            centerX: am5.p50
+                        })
+                        )
                 });
             });
 
