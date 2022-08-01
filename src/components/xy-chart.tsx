@@ -32,11 +32,11 @@ export type XYProps = {
 const XyChart: FC<XYProps> = ({ data, changeXYSerie }) => {
 
     const chartId = useId();
-    let [chartState, setChart] = useState<number>(0);
-    let [chartData, setData] = useState<XYdata[]>([]);
-    let [amRoot, setRoot] = useState<am5.Root>();
-    let [chartTheme, setTheme] = useState<am5.Theme | null>(null);
-    let [chartSeries, setSeries] = useState<XYSeriesEnums>(XYSeriesEnums.Column);
+    const [chartState, setChartState] = useState<number>(0);
+    const [chartData, setChartData] = useState<XYdata[]>([]);
+    const [amRoot, setAmRoot] = useState<am5.Root>();
+    const [chartTheme, setChartTheme] = useState<am5.Theme | null>(null);
+    const [chartSeries, setChartSeries] = useState<XYSeriesEnums>(XYSeriesEnums.Column);
 
     //let chartRef = React.createRef<HTMLDivElement>(); 
     // let chartRef = useRef(null); 
@@ -45,12 +45,12 @@ const XyChart: FC<XYProps> = ({ data, changeXYSerie }) => {
     //const xAxisRef = useRef(null);
 
     useLayoutEffect(() => {
-        setData(data[chartSeries]);
+        setChartData(data[chartSeries]);
         console.log('***rendering***', chartState, chartSeries);
 
         //let root = am5.Root.new(chartRef.current as HTMLElement);       
         let root: am5.Root = am5.Root.new(chartId);
-        setRoot(root);
+        setAmRoot(root);
 
         const customTheme = am5.Theme.new(root);
 
@@ -229,14 +229,14 @@ const XyChart: FC<XYProps> = ({ data, changeXYSerie }) => {
 
         return () => {
             root.dispose();
-            setChart(1);
+            setChartState(1);
         }
 
 
     }, [chartData, chartTheme, chartId, chartState, data, chartSeries]);
 
     const changeSeries = (newSerie) => {
-        setSeries(newSerie);
+        setChartSeries(newSerie);
         changeXYSerie && changeXYSerie(newSerie);
     }
 
@@ -259,7 +259,7 @@ const XyChart: FC<XYProps> = ({ data, changeXYSerie }) => {
                     <Col>
                         {/* <div ref={chartRef} id={chartId} style={{ width: "100%", height: "500px" }}></div> */}
                         <div id={chartId} style={{ width: "100%", height: "500px" }}></div>
-                        <ThemeSelect root={amRoot} handleChange={(event) => setTheme(event)}></ThemeSelect>
+                        <ThemeSelect root={amRoot} handleChange={(event) => setChartTheme(event)}></ThemeSelect>
                     </Col> </Row>
             </Container>
         </>

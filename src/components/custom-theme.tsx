@@ -49,9 +49,6 @@ type ThemeProps = {
 
 
 const ThemeSelect: FC<ThemeProps> = ({ root, handleChange }) => {
-    //let [chartTheme, setTheme] = useState<am5.Theme | null>(null);
-    // let [themesList] = useState<chartThemesProps>(allThemes);
-    //const [value, setValue] = useState();
 
     const updateValue = ({ target }) => {
         const newTheme: am5.Theme = allThemes.amThemes.find(theme => theme.name === target.value)?.theme?.new(root);

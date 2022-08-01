@@ -23,7 +23,7 @@ let XYseriesType = XYSeriesEnums.Column;
 let data = charts_data
 
 const ChartHome: FC<ChartHomeProps> = ({ chartType }) => {
-    let [allData, setData] = useState<ChartsData>(data);
+    const [allData, setAllData] = useState<ChartsData>(data);
 
     const renderSwitch = (param) => {
         console.log('render chart page')
@@ -50,12 +50,6 @@ const ChartHome: FC<ChartHomeProps> = ({ chartType }) => {
                         <Row>
                             <Col> <Hierarchy {...chartType} data={allData[chartType.id]}/>
                             </Col>
-                            {/* <Col sm={2}>
-                                <Stack gap={2}>
-                                    <ChartButton label="add Series" variant="success" onClick={() => manageXYSeries()}></ChartButton><ChartButton label="remove Series" variant="warning" disabled={XYseriesCount[XYseriesType] < 2} onClick={() => manageXYSeries(true)}></ChartButton>
-
-                                </Stack>
-                            </Col> */}
                         </Row>
                     </Container>
 
@@ -66,7 +60,7 @@ const ChartHome: FC<ChartHomeProps> = ({ chartType }) => {
     }
 
     const manageXYSeries = (remove = false) => {
-        setData((current) => {
+        setAllData((current) => {
             let newData: ChartsData = current;
             if (remove) {
                 if (XYseriesCount[XYseriesType] > 1) {

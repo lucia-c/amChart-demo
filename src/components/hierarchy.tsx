@@ -3,9 +3,8 @@ import React, { FC, useId, useLayoutEffect, useState } from "react";
 import * as am5 from "@amcharts/amcharts5";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
-import * as am5xy from "@amcharts/amcharts5/xy";
 import * as am5hierarchy from "@amcharts/amcharts5/hierarchy";
-import { HierarchyDataSeries, XYdata } from "../utils/mock";
+import { circleItem, HierarchyDataSeries, XYdata } from "../utils/mock";
 import ThemeSelect, { allThemes } from "./custom-theme";
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
@@ -14,11 +13,11 @@ import { Form } from "react-bootstrap";
 
 
 export enum HierarchySeriesEnums {
-    Force = 'Force'
+    Packed = 'Packed'
 }
 
 const HierarchySeries: HierarchySeriesEnums[] = [
-    HierarchySeriesEnums.Force
+    HierarchySeriesEnums.Packed
 ]
 
 export type HierarchyProps = {
@@ -31,11 +30,10 @@ export type HierarchyProps = {
 const HierarchyChart: FC<HierarchyProps> = ({ data, changeXYSerie }) => {
 
     const chartId = useId();
-    let [chartState, setChart] = useState<number>(0);
-    let [chartData, setData] = useState<XYdata[]>([]);
-    let [amRoot, setRoot] = useState<am5.Root>();
-    let [chartTheme, setTheme] = useState<am5.Theme | null>(null);
-    let [chartSeries, setSeries] = useState<HierarchySeriesEnums>(HierarchySeries[0]);
+    const [chartState, setChartState] = useState<number>(0);
+    const [chartData, setChartData] = useState<XYdata[]>([]);
+    const [amRoot, setAmRoot] = useState<am5.Root>();
+    const [chartTheme, setChartTheme] = useState<am5.Theme | null>(null);
 
     //let chartRef = React.createRef<HTMLDivElement>(); 
     // let chartRef = useRef(null); 
@@ -44,12 +42,12 @@ const HierarchyChart: FC<HierarchyProps> = ({ data, changeXYSerie }) => {
     //const xAxisRef = useRef(null);
 
     useLayoutEffect(() => {
-        setData(data[chartSeries]);
-        console.log('***rendering***', chartState, chartSeries);
+        setChartData(data[HierarchySeries[0]]);
+        console.log('***rendering***', chartState);
 
         //let root = am5.Root.new(chartRef.current as HTMLElement);       
         let root: am5.Root = am5.Root.new(chartId);
-        setRoot(root);
+        setAmRoot(root);
 
         const customTheme = am5.Theme.new(root);
 
@@ -71,61 +69,83 @@ const HierarchyChart: FC<HierarchyProps> = ({ data, changeXYSerie }) => {
             })
         );
 
-
-        let series = container.children.push(
-            am5hierarchy.ForceDirected.new(root, {
-                centerStrength: 1,
-                manyBodyStrength: 0.5,
-                //downDepth: 1,
-                //initialDepth: 3,
-                topDepth: 2,
-                valueField: "value",
-                categoryField: "name",
-                childDataField: "children",
-                nodePadding: 0.1,
-                //linkWithStrength: 20,
-                minRadius: 20,
-                maxRadius: am5.percent(15),
-                // initialFrames: 100,
-                // showOnFrame: 30,
-                // velocityDecay:0.4
-            })
-        );
+        let series = container.children.push(am5hierarchy.Pack.new(root, {
+            //singleBranchOnly: false,
+            //downDepth: 10,
+            topDepth: 2,
+            //initialDepth: 10,
+            valueField: "value",
+            categoryField: "name",
+            childDataField: "children",
+          }));
 
         series.circles.template.setAll({
             fillOpacity: 0.7,
             strokeWidth: 1,
             strokeOpacity: 1
         });
+        series.circles.template.states.create("hover", {
+                fillOpacity: 1,
+                strokeOpacity: 0,
+                strokeDasharray: 0,
+                scale: 1.3
+            });
 
+        // Force directed
+        // series.outerCircles.template.states.create("disabled", {
+        //     fillOpacity: 0.5,
+        //     strokeOpacity: 0,
+        //     strokeDasharray: 0
+        // });
 
-        series.outerCircles.template.states.create("disabled", {
-            fillOpacity: 0.5,
-            strokeOpacity: 0,
-            strokeDasharray: 0
-        });
+        // series.outerCircles.template.states.create("hover", {
+        //     fillOpacity: 1,
+        //     strokeOpacity: 0,
+        //     strokeDasharray: 0,
+        //     scale: 1.3
+        // });
+        // series.links.template.setAll({
+        //     strokeWidth: 0,
+        //     strokeOpacity: 0
+        // });
 
-        series.outerCircles.template.states.create("hover", {
-            fillOpacity: 1,
-            strokeOpacity: 0,
-            strokeDasharray: 0,
-            scale: 1.3
-        });
 
         series.nodes.template.setAll({
-            draggable: false
+            draggable: true,
+            toggleKey: "none",
         });
 
-        series.links.template.setAll({
-            strokeWidth: 0,
-            strokeOpacity: 0
-        });
+   
+        series.circles.template.adapters.add("fill", function(fill, target: am5.Circle) {
+            
+            if(target && target.dataItem?.dataContext) {
+                const item = target.dataItem?.dataContext as circleItem
+                switch (item['type']) {
+                        case "trend":
+                            return am5.color("#d553d5");
+                            case "team":
+                                return am5.color("#00aeff");
+                        default:
+                            return am5.color("#4e00df");  
+                }
 
-        series.labels.template.setAll({
-            fontSize: 20,
+            }
+
+            return am5.color("#ff00ff");
+
+            })
+
+
+        
+        const labeSettings: Partial<am5.ILabelSettings> = {
+            fontSize:10,
             //fill: am5.color(0x550000),
-            text: "{category}"
-          });
+            text: "{category}",
+            oversizedBehavior: 'truncate',
+            breakWords: true
+          }
+
+        series.labels.template.setAll(labeSettings);
 
         series.data.setAll(chartData);
         series.set("selectedDataItem", series.dataItems[0]);
@@ -138,11 +158,11 @@ const HierarchyChart: FC<HierarchyProps> = ({ data, changeXYSerie }) => {
 
         return () => {
             root.dispose();
-            setChart(1);
+            setChartState(1);
         }
 
 
-    }, [chartData, chartTheme, chartId, chartState, data, chartSeries]);
+    }, [chartData, chartTheme, chartId, chartState, data]);
 
     // const changeSeries = (newSerie) => {
     //     setSeries(newSerie);
@@ -168,7 +188,7 @@ const HierarchyChart: FC<HierarchyProps> = ({ data, changeXYSerie }) => {
                     <Col>
                         {/* <div ref={chartRef} id={chartId} style={{ width: "100%", height: "500px" }}></div> */}
                         <div id={chartId} style={{ width: "100%", height: "500px" }}></div>
-                        <ThemeSelect root={amRoot} handleChange={(event) => setTheme(event)}></ThemeSelect>
+                        {/* <ThemeSelect root={amRoot} handleChange={(event) => setChartTheme(event)}></ThemeSelect> */}
                     </Col> </Row>
             </Container>
         </>

@@ -27,12 +27,12 @@ const charts: ChartProps[] = [
 
 function App() {
 
-  let [chartType, setChart] = useState<ChartProps>(charts[0]);
+  const [chartType, setChartType] = useState<ChartProps>(charts[0]);
 
-  const changeChart = (id) => {
+  const changeChartDemo = (id) => {
     const selected = charts.find((chart: ChartProps) => chart.id === id)
     if (!!selected) {
-      setChart(selected);
+      setChartType(selected);
     }
     console.log('chart selected ', chartType);
   }
@@ -52,7 +52,7 @@ function App() {
               {
                 charts.map((chart, index) => {
                   const { id } = chart; //destrutturazione
-                  return <Button key={id} {...chart} disabled={chartType.id === chart.id} onClick={() => changeChart(chart.id)} size={'lg'}></Button>
+                  return <Button key={id} {...chart} disabled={chartType.id === chart.id} onClick={() => changeChartDemo(chart.id)} size={'lg'}></Button>
                 })}
 
             </Stack>
