@@ -162,16 +162,16 @@ const charts_data: ChartsData = {
   sliced: {
     pie: [
       {
-        country: "France",
-        sales: 100000,
+        label: "France",
+        value: 100000,
       },
       {
-        country: "Spain",
-        sales: 160000,
+        label: "Spain",
+        value: 160000,
       },
       {
-        country: "United Kingdom",
-        sales: 80000,
+        label: "United Kingdom",
+        value: 80000,
       },
     ],
   },

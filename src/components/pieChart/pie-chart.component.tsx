@@ -26,9 +26,7 @@ const PieChart: FC<PieChartProps> = ({ data }) => {
 
   useLayoutEffect(() => {
     setChartData(data[PieSeries[0]]);
-    console.log("***rendering***", chartData);
 
-    //let root = am5.Root.new(chartRef.current as HTMLElement);
     let root: am5.Root = am5.Root.new(chartId);
 
     const customTheme = am5.Theme.new(root);
@@ -55,8 +53,8 @@ const PieChart: FC<PieChartProps> = ({ data }) => {
     let series = chart.series.push(
       am5percent.PieSeries.new(root, {
         name: "Series",
-        valueField: "sales",
-        categoryField: "country",
+        valueField: "value",
+        categoryField: "label",
       })
     );
 
@@ -97,7 +95,7 @@ const PieChart: FC<PieChartProps> = ({ data }) => {
         <Row>
           <Col>
             <div id={chartId} style={{ width: "100%", height: "500px" }}></div>
-          </Col>{" "}
+          </Col>
         </Row>
       </Container>
     </>
