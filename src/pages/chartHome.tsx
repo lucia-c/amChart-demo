@@ -9,7 +9,9 @@ import Col from "react-bootstrap/Col";
 import { Stack } from "react-bootstrap";
 import charts_data, { ChartsData } from "../utils/mock";
 import Hierarchy from "../components/hierarchy";
-import PieChart from "../components/pieChart/pie-chart.component";
+import PieChart, {
+  PieSlicedSeriesEnums,
+} from "../components/pieChart/pie-chart.component";
 
 export type ChartHomeProps = {
   chartType: ChartProps;
@@ -21,6 +23,7 @@ let XYseriesCount = {
   Step: 5,
 };
 let XYseriesType = XYSeriesEnums.Column;
+let PieAndSliceType = PieSlicedSeriesEnums.pie;
 let data = charts_data;
 
 const ChartHome: FC<ChartHomeProps> = ({ chartType }) => {
@@ -59,12 +62,16 @@ const ChartHome: FC<ChartHomeProps> = ({ chartType }) => {
             </Row>
           </Container>
         );
-      case "sliced":
+      case "pieAndSliced":
         return (
           <Container>
             <Row>
               <Col>
-                <PieChart data={allData[chartType.id]} />
+                <PieChart
+                  {...chartType}
+                  data={allData[chartType.id]}
+                  changePieSlicedSeries={(serie) => (PieAndSliceType = serie)}
+                />
               </Col>
             </Row>
           </Container>

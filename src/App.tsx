@@ -24,8 +24,8 @@ const charts: ChartProps[] = [
   },
 
   {
-    id: "sliced",
-    label: "Pie Charts",
+    id: "pieAndSliced",
+    label: "Pie and Sliced Charts",
   },
 ];
 

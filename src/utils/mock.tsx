@@ -2,7 +2,7 @@
 export type ChartsData = {
   xy: XYDataSeries;
   hierarchy: HierarchyDataSeries;
-  sliced: PieDataSeries;
+  pieAndSliced: PieSlicedDataSeries;
 };
 
 export type circleItem = {
@@ -21,8 +21,9 @@ export type HierarchyDataSeries = {
   Packed: any;
 };
 
-export type PieDataSeries = {
+export type PieSlicedDataSeries = {
   pie: PieData[];
+  sliced: SlicedData[];
 };
 
 export type XYdata = {
@@ -30,6 +31,10 @@ export type XYdata = {
 };
 
 export type PieData = {
+  [key: string]: number | string;
+};
+
+export type SlicedData = {
   [key: string]: number | string;
 };
 
@@ -159,8 +164,22 @@ const charts_data: ChartsData = {
       },
     ],
   },
-  sliced: {
+  pieAndSliced: {
     pie: [
+      {
+        label: "France",
+        value: 100000,
+      },
+      {
+        label: "Spain",
+        value: 160000,
+      },
+      {
+        label: "United Kingdom",
+        value: 80000,
+      },
+    ],
+    sliced: [
       {
         label: "France",
         value: 100000,
