@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 import * as am5 from "@amcharts/amcharts5";
 import * as am5xy from "@amcharts/amcharts5/xy";
 import { XYSeriesEnums } from '../../components/xy-chart';
@@ -14,7 +14,7 @@ export enum AxisDataTypes {
   category = 'category'
 }
 
-const ChartCreation = (
+const useChart = (
   root?: am5.Root
 ): {
   initChart: (root: any, category: ChartCategories, customSettings?: IXYChartSettings) => am5xy.XYChart;
@@ -72,7 +72,9 @@ const ChartCreation = (
 
   }
 
-  const generateLabel = (settings: am5.ILabelSettings): Partial<am5.ILabelSettings> => {
+  const generateLabel = (
+    settings: am5.ILabelSettings
+  ): Partial<am5.ILabelSettings> => {
     return {
       fontSize: 14,
       //fill: am5.color(0x550000),
@@ -162,4 +164,4 @@ const ChartCreation = (
     primaryKey
   };
 };
-export default ChartCreation;
+export default useChart;

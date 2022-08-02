@@ -1,17 +1,32 @@
-import { ButtonHTMLAttributes, FC } from 'react';
-import Button from 'react-bootstrap/Button';
-import React from 'react'
+import { ButtonHTMLAttributes, FC } from "react";
+import Button from "react-bootstrap/Button";
 
 export type ButtonProps = {
   label: string;
   disabled?: boolean;
-  variant?: string
-  size?: 'sm' | 'lg' | undefined
+  variant?: string;
+  size?: "sm" | "lg" | undefined;
 } & ButtonHTMLAttributes<HTMLButtonElement>;
 
-const ChartButton: FC<ButtonProps> = ({ label, disabled = false, type = 'button', variant= 'primary', size, onClick, children}) => {
+const ChartButton: FC<ButtonProps> = ({
+  label,
+  disabled = false,
+  type = "button",
+  variant = "primary",
+  size,
+  onClick,
+  children,
+}) => {
   return (
-    <Button type={type} size={size} variant={variant} className="button" disabled={disabled} onClick={onClick}>{label}
+    <Button
+      type={type}
+      size={size}
+      variant={variant}
+      className="button"
+      disabled={disabled}
+      onClick={onClick}
+    >
+      {label}
     </Button>
   );
 };

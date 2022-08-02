@@ -12,7 +12,6 @@ import Col from 'react-bootstrap/Col';
 import { Form } from "react-bootstrap";
 import ChartCreation from "../common/hooks/chart.hook";
 
-
 export enum HierarchySeriesEnums {
     Pack = 'Pack',
     ForceDirected = 'ForceDirected'
@@ -28,17 +27,15 @@ export type HierarchyProps = {
 };
 
 function fillByType(type: string): am5.Color {
-
-    switch (type) {
-        case "trend":
-            return am5.color("#d553d5");
-        case "team":
-            return am5.color("#00aeff");
-        default:
-            return am5.color("#4e00df");
-    }
+  switch (type) {
+    case "trend":
+      return am5.color("#d553d5");
+    case "team":
+      return am5.color("#00aeff");
+    default:
+      return am5.color("#4e00df");
+  }
 }
-
 
 //export default function XyChart(props ){
 const HierarchyChart: FC<HierarchyProps> = ({ data, changeChartSeries }) => {
@@ -140,9 +137,9 @@ const HierarchyChart: FC<HierarchyProps> = ({ data, changeChartSeries }) => {
         // series.set("selectedDataItem", series.dataItems[0]);
         series.appear();
 
-        let legend = container.children.push(initLegend(root, {nameField: "name", fillField: "color"}));
+        // let legend = container.children.push(initLegend(root, {nameField: "name", fillField: "color"}));
 
-        if(series?.dataItems && series?.dataItems[0] && legend) {
+        // if(series?.dataItems && series?.dataItems[0] && legend) {
             // legend.data.setAll(series?.dataItems[0]?.get("children").map(team => { 
             //     if(team && team.dataContext) {
             //         const item = team.dataContext as circleItem
@@ -150,18 +147,67 @@ const HierarchyChart: FC<HierarchyProps> = ({ data, changeChartSeries }) => {
             //     }
             //     }
             //     )); 
+          // }
 
+    series.circles.template.setAll({
+      fillOpacity: 0.7,
+      strokeWidth: 1,
+      strokeOpacity: 1,
+      scale: 1,
+    });
+
+    series.circles.template.states.create("hover", {
+      fillOpacity: 1,
+      strokeOpacity: 0,
+      strokeDasharray: 0,
+      scale: 1.3,
+    });
+
+    // Force directed
+    // series.outerCircles.template.states.create("disabled", {
+    //     fillOpacity: 0.5,
+    //     strokeOpacity: 0,
+    //     strokeDasharray: 0
+    // });
+
+    // series.outerCircles.template.states.create("hover", {
+    //     fillOpacity: 1,
+    //     strokeOpacity: 0,
+    //     strokeDasharray: 0,
+    //     scale: 1.3
+    // });
+    // series.links.template.setAll({
+    //     strokeWidth: 0,
+    //     strokeOpacity: 0
+    // });
+
+    series.nodes.template.setAll({
+      draggable: true,
+      toggleKey: "none",
+    });
+
+    series.circles.template.adapters.add(
+      "fill",
+      function (fill, target: am5.Circle) {
+        if (target && target.dataItem?.dataContext) {
+          const item = target.dataItem?.dataContext as circleItem;
+          return fillByType(item["type"] as string);
         }
+      }
+    );
 
+    // const labeSettings: Partial<am5.ILabelSettings> = generateLabel({
+    //   text: "[bold]{category}[/]\n{value}%",
+    // });
 
-        // Make stuff animate on load
-        // https://www.amcharts.com/docs/v5/concepts/animations/
+    series.labels.template.setAll(labeSettings);
+    series.data.setAll(chartData);
+    //series.set("selectedDataItem", series.dataItems[0]);
+    series.appear();
 
-        return () => {
-            root.dispose();
-            setChartState(1);
-        }
-
+    let legend = container.children.push(
+      initLegend(root, { nameField: "name", fillField: "color" })
+    );
 
     }, [chartData, chartId, chartState, chartTheme, data, chartSeries]);
 
