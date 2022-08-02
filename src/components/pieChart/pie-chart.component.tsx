@@ -1,11 +1,12 @@
 import { FC, useId, useLayoutEffect, useState } from "react";
-import ChartCreation from "../../common/hooks/chart.hook";
+// import ChartCreation from "../../common/hooks/chart.hook";
 import * as am5 from "@amcharts/amcharts5";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 import { allThemes } from ".././custom-theme";
 import * as am5percent from "@amcharts/amcharts5/percent";
 import { Container, Row, Col, Form } from "react-bootstrap";
 import { PieData, PieSlicedDataSeries } from "../../utils/mock";
+import useChart from "../../common/hooks/chart.hook";
 
 export enum PieSlicedSeriesEnums {
   pie = "pie",
@@ -30,7 +31,7 @@ const PieChart: FC<PieChartProps> = ({ data, changePieSlicedSeries }) => {
     PieSlicedSeriesEnums.pie
   );
 
-  const { initContainer, initLegend, generateLabel } = ChartCreation();
+  const { initContainer, initLegend, generateLabel } = useChart();
 
   useLayoutEffect(() => {
     setChartData(data[PieSeries[0]]);
@@ -60,6 +61,7 @@ const PieChart: FC<PieChartProps> = ({ data, changePieSlicedSeries }) => {
         chart = container.children.push(
           am5percent.PieChart.new(root, {
             layout: root.verticalLayout,
+            innerRadius: am5.percent(80),
           })
         );
         series = chart.series.push(
@@ -117,6 +119,7 @@ const PieChart: FC<PieChartProps> = ({ data, changePieSlicedSeries }) => {
     };
   }, [
     chartData,
+    chartSeries,
     chartId,
     chartState,
     data,

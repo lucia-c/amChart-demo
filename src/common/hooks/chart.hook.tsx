@@ -3,7 +3,7 @@ import * as am5 from "@amcharts/amcharts5";
 import * as am5xy from "@amcharts/amcharts5/xy";
 import { XYSeriesEnums } from "../../components/xy-chart";
 
-const ChartCreation = (
+const useChart = (
   root?: am5.Root,
   series?: XYSeriesEnums
 ): {
@@ -97,4 +97,4 @@ const ChartCreation = (
     primaryKey,
   };
 };
-export default ChartCreation;
+export default useChart;
