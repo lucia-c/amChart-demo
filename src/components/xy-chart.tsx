@@ -4,13 +4,13 @@ import * as am5 from "@amcharts/amcharts5";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
 import * as am5xy from "@amcharts/amcharts5/xy";
-import { XYdata, XYDataSeries } from "../utils/mock";
+import { GenericData, XYDataSeries } from "../utils/mock";
 import ThemeSelect, { allThemes } from "./custom-theme";
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { Form } from "react-bootstrap";
-import ChartCreation from "../common/hooks/chart.hook"
+import ChartCreation, { AxisDataTypes, ChartCategories } from "../common/hooks/chart.hook"
 
 
 export enum XYSeriesEnums {
@@ -34,23 +34,23 @@ const XyChart: FC<XYProps> = ({ data, changeXYSerie }) => {
 
     const chartId = useId();
     const [chartState, setChartState] = useState<number>(0);
-    const [chartData, setChartData] = useState<XYdata[]>([]);
+    const [chartData, setChartData] = useState<GenericData[]>([]);
     const [amRoot, setAmRoot] = useState<am5.Root>();
     const [chartTheme, setChartTheme] = useState<am5.Theme | null>(null);
     const [chartSeries, setChartSeries] = useState<XYSeriesEnums>(XYSeriesEnums.Column);
-    const { initChart, initLegend, primaryKey, generateLabel} = ChartCreation();
+    const { initChart, initLegend, initPrimaryKey, generateLabel, generateXAxe, generateYAxe} = ChartCreation();
 
     
     useLayoutEffect(() => {
         setChartData(data[chartSeries]);
-        console.log('***rendering***', chartState, chartSeries);
+        console.log('***rendering***', chartData, chartSeries);
         
         //let root = am5.Root.new(chartRef.current as HTMLElement);       
-        let root: am5.Root = am5.Root.new(chartId);
-        
+        let root: am5.Root = am5.Root.new(chartId);    
         setAmRoot(root);
 
         const customTheme = am5.Theme.new(root);
+
         customTheme.rule("Label").setAll(allThemes.allianz);
 
         // Set themes from select list
@@ -61,34 +61,18 @@ const XyChart: FC<XYProps> = ({ data, changeXYSerie }) => {
         }
         root.setThemes(actualThemes);    
 
-        let chart = initChart(root);
-
-        // Add legend
-        // https://www.amcharts.com/docs/v5/charts/xy-chart/legend-xy-series/
+        let chart = initChart(root, ChartCategories.xy);
+        let primaryKey = initPrimaryKey(chartSeries);
         let legend = chart.children.push(initLegend(root));
 
         // Create X-Axis
         let xAxis: am5xy.CategoryAxis<am5xy.AxisRenderer> | am5xy.DateAxis<am5xy.AxisRenderer>;
         switch (chartSeries) {
             case XYSeriesEnums.Step:
-                xAxis = chart.xAxes.push(am5xy.DateAxis.new(root, {
-                    baseInterval: { timeUnit: "day", count: 1 },
-                    renderer: am5xy.AxisRendererX.new(root, {
-                        minGridDistance: 20
-                    }),
-                }));
+                xAxis = generateXAxe(root, chart, primaryKey, AxisDataTypes.date);
                 break;
-        
             default:
-                xAxis = chart.xAxes.push(am5xy.CategoryAxis.new(root, {
-                    categoryField: primaryKey,
-                    renderer: am5xy.AxisRendererX.new(root, {
-                        cellStartLocation: 0.1,
-                        cellEndLocation: 0.9
-                    }),
-                    tooltip: am5.Tooltip.new(root, {}),
-                    maxDeviation: 0.2,
-                }));
+                xAxis = generateXAxe(root, chart, primaryKey);
                 break;
         }
 
@@ -97,11 +81,7 @@ const XyChart: FC<XYProps> = ({ data, changeXYSerie }) => {
         xAxis.data.setAll(chartData);
 
         // Create Y-axis
-        let yAxis: am5xy.ValueAxis<am5xy.AxisRenderer> = chart.yAxes.push(
-            am5xy.ValueAxis.new(root, {
-                renderer: am5xy.AxisRendererY.new(root, {}),
-            })
-        );
+        let yAxis = generateYAxe(root, chart);
 
         // Add cursor
         chart.set("cursor", am5xy.XYCursor.new(root, {}));
@@ -204,10 +184,12 @@ const XyChart: FC<XYProps> = ({ data, changeXYSerie }) => {
         }
 
 
-    }, [chartData, chartTheme, chartId, chartState, data, chartSeries]);
+    }, [chartTheme, chartId, chartState, data, chartSeries, chartData]);
 
     const changeSeries = (newSerie) => {
+        console.log('CHANGE xy serie', newSerie)
         setChartSeries(newSerie);
+        setChartData(data[newSerie]);
         changeXYSerie && changeXYSerie(newSerie);
     }
 
