@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Button from "./components/button";
 import ChartHome from "./pages/chartHome";
+import Home from "./pages/home";
 import "./App.scss";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
@@ -15,6 +16,10 @@ export type ChartProps = {
 
 const charts: ChartProps[] = [
   {
+    id: "line",
+    label: "Line Chart",
+  },
+  {
     id: "xy",
     label: "XY charts",
   },
@@ -26,7 +31,7 @@ const charts: ChartProps[] = [
   {
     id: "pieAndSliced",
     label: "Pie and Sliced Charts",
-  },
+  }
 ];
 
 function App() {
@@ -68,7 +73,8 @@ function App() {
         </Row>
         <Row>
           <Col>
-            <ChartHome chartType={chartType} />
+            {/* <ChartHome chartType={chartType} /> */}
+            <Home chartType={chartType} />
           </Col>
         </Row>
       </Container>
