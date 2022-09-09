@@ -5,6 +5,8 @@ import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import LineChart from "../components/charts/lineChart";
+import HierarchyChart from "../components/hierarchy";
+import charts_data from "../utils/mock";
 
 export type ChartHomeProps = {
   chartType: ChartProps;

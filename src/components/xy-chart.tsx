@@ -42,6 +42,7 @@ const XyChart: FC<XYProps> = ({ data, changeXYSerie }) => {
 
     
     useLayoutEffect(() => {
+        
         setChartData(data[chartSeries]);
         console.log('***rendering***', chartData, chartSeries);
         

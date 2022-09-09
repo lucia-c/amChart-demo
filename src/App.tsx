@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import Button from "./components/button";
-import ChartHome from "./pages/chartHome";
 import Home from "./pages/home";
 import "./App.scss";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import { Stack } from "react-bootstrap";
+import ChartHome from "./pages/chartHome";
 
 export type ChartProps = {
   id: string;
@@ -35,7 +35,7 @@ const charts: ChartProps[] = [
 ];
 
 function App() {
-  const [chartType, setChartType] = useState<ChartProps>(charts[0]);
+  const [chartType, setChartType] = useState<ChartProps>(charts[1]);
 
   const changeChartDemo = (id) => {
     const selected = charts.find((chart: ChartProps) => chart.id === id);
@@ -56,7 +56,7 @@ function App() {
         <Row className="justify-content-md-center mb-4">
           <Col xs="auto">
             <Stack direction="horizontal" gap={3}>
-              {charts.map((chart, index) => {
+              {charts.filter((chart) => chart.id !== 'line').map((chart, index) => {
                 const { id } = chart; //destrutturazione
                 return (
                   <Button
@@ -73,8 +73,8 @@ function App() {
         </Row>
         <Row>
           <Col>
-            {/* <ChartHome chartType={chartType} /> */}
-            <Home chartType={chartType} />
+            <ChartHome chartType={chartType} />
+            {/* <Home chartType={chartType} /> */}
           </Col>
         </Row>
       </Container>
